@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:studize/components/alert_dialog_box.dart';
 import 'package:studize/constants/constants.dart';
+import 'package:studize/constants/routes.dart';
 import 'package:studize/models/tasks_data_source.dart';
 
 class AddTaskScreen extends StatefulWidget {
@@ -48,6 +49,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           _startDateTime.hour,
           _startDateTime.minute,
         );
+        _endDateTime = DateTime(
+          value.year,
+          value.month,
+          value.day,
+          _endDateTime.hour + DefaultSettings.defaultDuration,
+          _endDateTime.minute,
+        );
       });
     });
   }
@@ -92,6 +100,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           _startDateTime.month,
           _startDateTime.day,
           value!.hour,
+          value.minute,
+        );
+        _endDateTime = DateTime(
+          _endDateTime.year,
+          _endDateTime.month,
+          _endDateTime.day,
+          value.hour + DefaultSettings.defaultDuration,
           value.minute,
         );
       });
@@ -290,6 +305,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                           _startDateTime,
                           _endDateTime,
                         );
+                        Navigator.pop(context);
+                        Navigator.pushReplacementNamed(context, homeScreen);
                       } else {
                         showAlertDialog(
                           context: context,
