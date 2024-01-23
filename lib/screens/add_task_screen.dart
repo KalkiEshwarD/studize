@@ -1,34 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:studize/components/alert_dialog_box.dart';
 import 'package:studize/constants/constants.dart';
-
-enum TaskType {
-  mathematics,
-  physics,
-  chemistry;
-}
-
-class Task {
-  late TaskType taskType;
-  late DateTime startDateTime;
-  late DateTime endDateTime;
-
-  static int mathTasks = 0;
-  static int phyTasks = 0;
-  static int chemTasks = 0;
-
-  Task(this.taskType, this.startDateTime, this.endDateTime) {
-    if (taskType == TaskType.mathematics) {
-      mathTasks++;
-    } else if (taskType == TaskType.physics) {
-      phyTasks++;
-    } else if (taskType == TaskType.chemistry) {
-      chemTasks++;
-    } else {
-      throw Error();
-    }
-  }
-}
+import 'package:studize/models/tasks_data_source.dart';
 
 class AddTaskScreen extends StatefulWidget {
   const AddTaskScreen({super.key});
@@ -38,34 +11,27 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
-  final subjects = [
+  var subjects = [
     'Mathematics',
     'Physics',
     'Chemistry',
   ];
 
-  String dropDownValue = 'Select Subject';
+  String dropDownValue = 'Mathematics';
 
-  DateTime _startDate = DateTime(
+  DateTime _startDateTime = DateTime(
     DateTime.now().year,
     DateTime.now().month,
     DateTime.now().day,
     DateTime.now().hour + 1,
   );
-  TimeOfDay _startTime = TimeOfDay(
-    hour: TimeOfDay.now().hour + 1,
-    minute: 0,
-  );
 
-  DateTime _endDate = DateTime(
+  DateTime _endDateTime = DateTime(
     DateTime.now().year,
     DateTime.now().month,
     DateTime.now().day,
-    DateTime.now().hour + DefaultSettings.defaultDuration,
+    DateTime.now().hour + 1 + DefaultSettings.defaultDuration,
   );
-  TimeOfDay _endTime = TimeOfDay(
-      hour: DateTime.now().hour + 1 + DefaultSettings.defaultDuration,
-      minute: 0);
 
   void _showStartDatePicker() {
     showDatePicker(
@@ -75,7 +41,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       lastDate: DateTime(3000),
     ).then((value) {
       setState(() {
-        _startDate = value!;
+        _startDateTime = DateTime(
+          value!.year,
+          value.month,
+          value.day,
+          _startDateTime.hour,
+          _startDateTime.minute,
+        );
       });
     });
   }
@@ -88,9 +60,22 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       lastDate: DateTime(3000),
     ).then((value) {
       setState(() {
-        _endDate = value!;
+        _endDateTime = DateTime(
+          value!.year,
+          value.month,
+          value.day,
+          _endDateTime.hour,
+          _endDateTime.minute,
+        );
       });
     });
+  }
+
+  TaskType _convertString(String subject) {
+    if (subject.compareTo('Mathematics') == 0) return TaskType.mathematics;
+    if (subject.compareTo('Physics') == 0) return TaskType.physics;
+    if (subject.compareTo('Chemistry') == 0) return TaskType.chemistry;
+    throw Error();
   }
 
   void _showStartTimePicker() {
@@ -102,7 +87,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       ),
     ).then((value) {
       setState(() {
-        _startTime = value!;
+        _startDateTime = DateTime(
+          _startDateTime.year,
+          _startDateTime.month,
+          _startDateTime.day,
+          value!.hour,
+          value.minute,
+        );
       });
     });
   }
@@ -116,13 +107,19 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       ),
     ).then((value) {
       setState(() {
-        _endTime = value!;
+        _endDateTime = DateTime(
+          _endDateTime.year,
+          _endDateTime.month,
+          _endDateTime.day,
+          value!.hour,
+          value.minute,
+        );
       });
     });
   }
 
-  String _displayTime(TimeOfDay timeOfDay) {
-    return '${timeOfDay.hour}:${(timeOfDay.minute.toString().length == 1) ? '0${timeOfDay.minute}' : timeOfDay.minute}';
+  String _displayTime(DateTime dateTime) {
+    return '${dateTime.hour}:${(dateTime.minute.toString().length == 1) ? '0${dateTime.minute}' : dateTime.minute}';
   }
 
   String _displayDate(DateTime dateTime) {
@@ -132,25 +129,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   bool _validateDateTime(
     DateTime date1,
-    TimeOfDay time1,
     DateTime date2,
-    TimeOfDay time2,
   ) {
     if (date2.isBefore(date1)) {
       return false;
-    } else if (date1 == date2) {
-      if ((time2.hour - time1.hour) > 0) {
-        return true;
-      } else if ((time2.hour - time2.hour) == 0) {
-        if ((time2.minute - time1.minute) > 0) {
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
     } else {
+      if (date1 == date2) return false;
       return true;
     }
   }
@@ -173,6 +157,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             top: 50.0,
             bottom: 20,
             left: 50,
+            right: 50,
           ),
           child: Table(
             children: [
@@ -183,21 +168,27 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     style: TextStyle(fontSize: 20),
                   ),
                   DropdownButton(
+                    // Initial Value
                     value: dropDownValue,
-                    items:
-                        subjects.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
+
+                    // Down Arrow Icon
+                    icon: const Icon(Icons.keyboard_arrow_down),
+
+                    // Array list of items
+                    items: subjects.map((String subjects) {
+                      return DropdownMenuItem(
+                        value: subjects,
+                        child: Text(subjects),
                       );
                     }).toList(),
-                    onChanged: (String? value) {
-                      // This is called when the user selects an item.
+                    // After selecting the desired option,it will
+                    // change button value to selected value
+                    onChanged: (String? newValue) {
                       setState(() {
-                        dropDownValue = value!;
+                        dropDownValue = newValue!;
                       });
                     },
-                  )
+                  ),
                 ],
               ),
               const TableRow(children: [
@@ -214,7 +205,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     onPressed: () => _showStartDatePicker(),
                     style: ElevatedButton.styleFrom(
                         shape: const RoundedRectangleBorder()),
-                    child: Text(_displayDate(_startDate)),
+                    child: Text(_displayDate(_startDateTime)),
                   ),
                 ],
               ),
@@ -232,7 +223,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     onPressed: () => _showStartTimePicker(),
                     style: ElevatedButton.styleFrom(
                         shape: const RoundedRectangleBorder()),
-                    child: Text(_displayTime(_startTime)),
+                    child: Text(_displayTime(_startDateTime)),
                   ),
                 ],
               ),
@@ -250,7 +241,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     onPressed: () => _showEndDatePicker(),
                     style: ElevatedButton.styleFrom(
                         shape: const RoundedRectangleBorder()),
-                    child: Text(_displayDate(_endDate)),
+                    child: Text(_displayDate(_endDateTime)),
                   ),
                 ],
               ),
@@ -268,7 +259,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     onPressed: () => _showEndTimePicker(),
                     style: ElevatedButton.styleFrom(
                         shape: const RoundedRectangleBorder()),
-                    child: Text(_displayTime(_endTime)),
+                    child: Text(_displayTime(_endDateTime)),
                   ),
                 ],
               ),
@@ -293,9 +284,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       style: TextStyle(fontSize: 20),
                     ),
                     onPressed: () {
-                      if (_validateDateTime(
-                          _startDate, _startTime, _endDate, _endTime)) {
-                        //TODO: Implement add task
+                      if (_validateDateTime(_startDateTime, _endDateTime)) {
+                        Task(
+                          _convertString(dropDownValue),
+                          _startDateTime,
+                          _endDateTime,
+                        );
                       } else {
                         showAlertDialog(
                           context: context,

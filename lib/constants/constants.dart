@@ -13,6 +13,8 @@ class DefaultSettings {
   // Duration mentioned in hours
   static var defaultDuration = 1;
 
+  static var defaultColor = Colors.blue;
+
   static void changeSettings(int durationHours) {
     defaultDuration = durationHours;
   }

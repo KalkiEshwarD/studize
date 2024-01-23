@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
           view: currentCalendarView,
           firstDayOfWeek: 1,
-          dataSource: TasksDataSource(getTasks()),
+          dataSource: TasksDataSource(Task.getTasks()),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
