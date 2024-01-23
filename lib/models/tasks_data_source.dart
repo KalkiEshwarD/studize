@@ -22,13 +22,9 @@ class Task {
   static int phyTasks = 0;
   static int chemTasks = 0;
 
-  static List<Appointment> tasksList = <Appointment>[];
   static List<Appointment> tasks = <Appointment>[];
 
   static List<Appointment> getTasks() {
-    for (Appointment appointment in tasksList) {
-      tasks.add(appointment);
-    }
     return tasks;
   }
 
@@ -48,7 +44,7 @@ class Task {
       throw Error();
     }
 
-    tasksList.add(
+    tasks.add(
       Appointment(
         startTime: startDateTime,
         endTime: endDateTime,
