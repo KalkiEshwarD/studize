@@ -1,5 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:studize/components/alert_dialog_box.dart';
 import 'package:studize/constants/constants.dart';
+
+enum TasksType {
+  mathematics,
+  physics,
+  chemistry;
+}
+
+class Tasks {
+  late TasksType taskType;
+  int tasks = 0;
+}
 
 class AddTaskScreen extends StatefulWidget {
   const AddTaskScreen({super.key});
@@ -85,12 +97,37 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   }
 
   String _displayTime(TimeOfDay timeOfDay) {
-    return '${timeOfDay.hour}:00';
+    return '${timeOfDay.hour}:${(timeOfDay.minute.toString().length == 1) ? '0${timeOfDay.minute}' : timeOfDay.minute}';
   }
 
   String _displayDate(DateTime dateTime) {
     late final String month = StaticConstants.monthList[dateTime.month];
     return '$month ${dateTime.day}, ${dateTime.year}';
+  }
+
+  bool _validateDateTime(
+    DateTime date1,
+    TimeOfDay time1,
+    DateTime date2,
+    TimeOfDay time2,
+  ) {
+    if (date2.isBefore(date1)) {
+      return false;
+    } else if (date1 == date2) {
+      if ((time2.hour - time1.hour) > 0) {
+        return true;
+      } else if ((time2.hour - time2.hour) == 0) {
+        if ((time2.minute - time1.minute) > 0) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
   }
 
   @override
@@ -122,9 +159,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () => _showStartDatePicker(),
+                    style: ElevatedButton.styleFrom(
+                        shape: const RoundedRectangleBorder()),
                     child: Text(_displayDate(_startDate)),
-                    // style: ElevatedButton.styleFrom(
-                    //     shape: const RoundedRectangleBorder()),
                   ),
                 ],
               ),
@@ -140,9 +177,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () => _showStartTimePicker(),
+                    style: ElevatedButton.styleFrom(
+                        shape: const RoundedRectangleBorder()),
                     child: Text(_displayTime(_startTime)),
-                    // style: ElevatedButton.styleFrom(
-                    //     shape: const RoundedRectangleBorder()),
                   ),
                 ],
               ),
@@ -158,9 +195,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () => _showEndDatePicker(),
+                    style: ElevatedButton.styleFrom(
+                        shape: const RoundedRectangleBorder()),
                     child: Text(_displayDate(_endDate)),
-                    // style: ElevatedButton.styleFrom(
-                    //     shape: const RoundedRectangleBorder()),
                   ),
                 ],
               ),
@@ -176,12 +213,47 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () => _showEndTimePicker(),
+                    style: ElevatedButton.styleFrom(
+                        shape: const RoundedRectangleBorder()),
                     child: Text(_displayTime(_endTime)),
-                    // style: ElevatedButton.styleFrom(
-                    //     shape: const RoundedRectangleBorder()),
                   ),
                 ],
               ),
+              const TableRow(children: [
+                SizedBox(height: StaticConstants.tableRowSpacing),
+                SizedBox(height: StaticConstants.tableRowSpacing),
+              ]),
+              TableRow(
+                children: [
+                  ElevatedButton(
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text(
+                      'Add task',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    onPressed: () {
+                      if (_validateDateTime(
+                          _startDate, _startTime, _endDate, _endTime)) {
+                        //TODO: Implement add task
+                      } else {
+                        showAlertDialog(
+                          context: context,
+                          title: 'Invalid Input!',
+                          text: 'Please enter a valid input.',
+                        );
+                      }
+                    },
+                  ),
+                ],
+              )
             ],
           ),
         ),
@@ -189,23 +261,3 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
   }
 }
-
-// Row(
-//               children: [
-//                 const Column(
-//                   children: [
-                   
-                    // Text(
-//                       'Start time',
-//                       style: TextStyle(fontSize: 20),
-//                     ),
-//                   ],
-//                 ),
-//                 const Padding(padding: EdgeInsets.only(right: 50)),
-//                 Column(
-//                   children: [
-                    
-//                   ],
-//                 )
-//               ],
-//             ),
