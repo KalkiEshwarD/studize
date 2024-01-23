@@ -14,19 +14,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   static CalendarView currentCalendarView = CalendarView.day;
 
-  static bool _validCalendarView(CalendarView calendarView) {
-    if (calendarView == CalendarView.day) return true;
-    if (calendarView == CalendarView.week) return true;
-    if (calendarView == CalendarView.month) return true;
-    return false;
-  }
-
-  static setCalendarView(CalendarView calendarView) {
-    if (_validCalendarView(calendarView)) {
-      currentCalendarView = calendarView;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
