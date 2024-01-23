@@ -6,8 +6,23 @@ Drawer primaryDrawer(context) => Drawer(
       shape: const Border(),
       child: ListView(
         children: [
-          const ListTile(
-            title: Row(
+          ListTile(
+            title: const Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(right: PaddingDist.drawerDistance),
+                  child: Icon(Icons.calendar_month_outlined),
+                ),
+                Text('My calendar'),
+              ],
+            ),
+            onTap: () {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, homeScreen, (route) => false);
+            },
+          ),
+          ListTile(
+            title: const Row(
               children: [
                 Padding(
                   padding: EdgeInsets.only(right: PaddingDist.drawerDistance),
@@ -16,6 +31,10 @@ Drawer primaryDrawer(context) => Drawer(
                 Text('Tasks overview'),
               ],
             ),
+            onTap: () {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, tasksOverviewScreen, (route) => false);
+            },
           ),
           const ListTile(
             title: Divider(),
@@ -61,44 +80,6 @@ Drawer primaryDrawer(context) => Drawer(
             ),
             onTap: () {
               //TODO: Complete on tap
-            },
-          ),
-          ListTile(
-            title: const Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(right: PaddingDist.drawerDistance),
-                  child: Icon(Icons.logout),
-                ),
-                Text('Sign Out'),
-              ],
-            ),
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Sign Out'),
-                    content: const Text('Do you want to sign out?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          // Close the dialog when the button is pressed
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, signInScreen, (route) => false);
-                        },
-                        child: const Text('Sign Out'),
-                      ),
-                    ],
-                  );
-                },
-              );
             },
           ),
         ],

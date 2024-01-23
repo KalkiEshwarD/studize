@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:studize/components/drawer.dart';
+import 'package:studize/constants/routes.dart';
 import 'package:studize/models/tasks_data_source.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -43,6 +44,12 @@ class _HomeScreenState extends State<HomeScreen> {
           view: currentCalendarView,
           firstDayOfWeek: 1,
           dataSource: TasksDataSource(getTasks()),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.pushNamed(context, addTaskScreen);
+          },
+          child: const Icon(Icons.add_task_sharp),
         ),
       ),
     );
