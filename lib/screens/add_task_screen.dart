@@ -2,15 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:studize/components/alert_dialog_box.dart';
 import 'package:studize/constants/constants.dart';
 
-enum TasksType {
+enum TaskType {
   mathematics,
   physics,
   chemistry;
 }
 
-class Tasks {
-  late TasksType taskType;
-  int tasks = 0;
+class Task {
+  late TaskType taskType;
+  late DateTime startDateTime;
+  late DateTime endDateTime;
+
+  static int mathTasks = 0;
+  static int phyTasks = 0;
+  static int chemTasks = 0;
+
+  Task(this.taskType, this.startDateTime, this.endDateTime) {
+    if (taskType == TaskType.mathematics) {
+      mathTasks++;
+    } else if (taskType == TaskType.physics) {
+      phyTasks++;
+    } else if (taskType == TaskType.chemistry) {
+      chemTasks++;
+    } else {
+      throw Error();
+    }
+  }
 }
 
 class AddTaskScreen extends StatefulWidget {
@@ -21,6 +38,14 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
+  final subjects = [
+    'Mathematics',
+    'Physics',
+    'Chemistry',
+  ];
+
+  String dropDownValue = 'Select Subject';
+
   DateTime _startDate = DateTime(
     DateTime.now().year,
     DateTime.now().month,
@@ -151,6 +176,34 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           ),
           child: Table(
             children: [
+              TableRow(
+                children: [
+                  const Text(
+                    'Start date',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  DropdownButton(
+                    value: dropDownValue,
+                    items:
+                        subjects.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      // This is called when the user selects an item.
+                      setState(() {
+                        dropDownValue = value!;
+                      });
+                    },
+                  )
+                ],
+              ),
+              const TableRow(children: [
+                SizedBox(height: StaticConstants.tableRowSpacing),
+                SizedBox(height: StaticConstants.tableRowSpacing),
+              ]),
               TableRow(
                 children: [
                   const Text(
